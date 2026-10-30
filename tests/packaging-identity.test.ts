@@ -39,7 +39,7 @@ describe("platform packaging identity", () => {
   it("keeps the Linux install path space-free and delegates package setup to the builder", () => {
     const app = new AppInfo(packager, undefined, config.linux);
     const installPath = `${installPrefix}/${app.sanitizedProductName}`;
-    expect(installPath).toBe("/opt/HermesOne");
+    expect(installPath).toBe("/opt/OLYMPUS");
     expect(config.deb?.afterInstall).toBeUndefined();
     expect(config.rpm?.afterInstall).toBeUndefined();
   });

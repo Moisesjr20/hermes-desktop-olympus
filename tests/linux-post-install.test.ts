@@ -120,7 +120,7 @@ async function runHook(
     .replaceAll("/usr/bin/ischroot", join(bin, "ischroot"))
     .replaceAll("/proc/self/ns/user", join(home, "user-namespace"));
   expect(script).not.toMatch(
-    /\/opt\/HermesOne|\/etc\/apparmor\.d|\/usr\/bin\/ischroot/,
+    /\/opt\/OLYMPUS|\/etc\/apparmor\.d|\/usr\/bin\/ischroot/,
   );
   const hook = join(home, "safe-post-install.sh");
   writeFileSync(hook, script);
@@ -155,7 +155,7 @@ describe.skipIf(process.platform === "win32")(
         expect(fixture.result.status).toBe(0);
         expect(existsSync(fixture.installed)).toBe(true);
         expect(readFileSync(fixture.installed, "utf8")).toBe(fixture.profile);
-        expect(fixture.profile).toContain('"/opt/HermesOne/hermes-desktop"');
+        expect(fixture.profile).toContain('"/opt/OLYMPUS/olympus-desktop"');
         expect(fixture.commands).toContain(
           "apparmor_parser\t--skip-kernel-load --debug",
         );
