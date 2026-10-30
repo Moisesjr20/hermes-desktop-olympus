@@ -9,7 +9,7 @@ export default {
   nav: {
     groups: {
       general: "通用",
-      hermes: "Hermes One",
+      hermes: "OLYMPUS",
     },
     appearance: "外观",
     language: "语言",

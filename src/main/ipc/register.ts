@@ -508,7 +508,7 @@ export interface IpcContext {
   openExternalUrl: (rawUrl: unknown) => void;
 }
 
-const APP_NAME = process.env.HERMES_DESKTOP_APP_NAME?.trim() || "Hermes One";
+const APP_NAME = process.env.HERMES_DESKTOP_APP_NAME?.trim() || "OLYMPUS";
 
 type RemoteSessionBridgeConfig = RemoteSessionConfig;
 

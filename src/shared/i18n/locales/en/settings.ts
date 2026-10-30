@@ -9,7 +9,7 @@ export default {
   nav: {
     groups: {
       general: "General",
-      hermes: "Hermes One",
+      hermes: "OLYMPUS",
     },
     appearance: "Appearance",
     language: "Language",
@@ -24,7 +24,7 @@ export default {
     logs: "Logs & Diagnostics",
   },
   agentSubtitle: "The local AI engine",
-  desktopTitle: "Hermes One Desktop",
+  desktopTitle: "OLYMPUS Desktop",
   desktopSubtitle: "This desktop app",
   statusUpToDate: "Up to date",
   statusUpdateAvailable: "Update available",
@@ -108,7 +108,7 @@ export default {
   },
   analytics: {
     label: "Send anonymous usage analytics",
-    hint: "Collected anonymously and used only to improve Hermes One — never your chats, files, prompts, or any personal data.",
+    hint: "Collected anonymously and used only to improve OLYMPUS — never your chats, files, prompts, or any personal data.",
   },
   notDetected: "Not detected",
   updatedSuccessfully: "Updated successfully!",
@@ -161,7 +161,7 @@ export default {
   latestVersion: "Already up to date",
   autoUpgradeDesktop: "Auto-upgrade desktop app",
   autoUpgradeDesktopHint:
-    "Automatically download new Hermes One releases from GitHub when the app starts. Turn this off to show the startup upgrade button without downloading until you click it.",
+    "Automatically download new OLYMPUS releases from GitHub when the app starts. Turn this off to show the startup upgrade button without downloading until you click it.",
   runningDiagnosis: "Running diagnosis...",
   runDiagnosis: "Run Diagnosis",
   running: "Running...",
@@ -228,14 +228,14 @@ export default {
     "Join our Discord channel to ask questions, report issues, and chat with other Hermes users.",
   joinDiscord: "Join Discord Channel",
   communityLinksHint:
-    "Connect with the Hermes One community, get help, and stay up to date.",
+    "Connect with the OLYMPUS community, get help, and stay up to date.",
   linkWebsite: "Website",
   linkDiscord: "Discord",
   linkX: "X",
   linkTelegram: "Telegram",
   supportTitle: "Support the developer",
   supportHint:
-    "Hermes One is free and open source — if it helps you, consider supporting its development.",
+    "OLYMPUS is free and open source — if it helps you, consider supporting its development.",
   supportKofi: "Support on Ko-fi",
 
   // SSH & Server Config

@@ -1,4 +1,4 @@
-appId: com.nousresearch.hermes
+appId: com.kyrius.olympus
 # productName is now space-free so the Linux .deb installs to
 # /opt/HermesOne/hermes-agent instead of `/opt/Hermes One/hermes-agent`.
 # The previous path crashed Chromium's zygote on launch because
@@ -8,7 +8,7 @@ appId: com.nousresearch.hermes
 # The user-facing display name "Hermes One" is restored through
 # `linux.desktop.entry.Name`, `nsis.shortcutName`, `nsis.uninstallDisplayName`,
 # and `mac.extendInfo.CFBundleDisplayName` so end users see no change.
-productName: HermesOne
+productName: OLYMPUS
 directories:
   buildResources: build
 files:

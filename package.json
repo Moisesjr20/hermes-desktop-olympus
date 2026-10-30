@@ -1,7 +1,7 @@
 {
-  "name": "hermes-desktop",
+  "name": "olympus-desktop",
   "version": "0.7.7",
-  "description": "Hermes Agent Desktop — self-improving AI assistant",
+  "description": "OLYMPUS Desktop — Hermes-powered multi-agent experience by Moises Kyrius",
   "main": "./out/main/index.js",
   "author": "fathah",
   "homepage": "https://github.com/fathah/hermes-desktop",
