@@ -1172,7 +1172,7 @@ it("keeps the empty chat avatar on its run profile and updates it with that run"
   await waitFor(() => {
     expect(
       view.container.querySelector(".chat-empty .chat-empty-logo"),
-    ).toHaveAttribute("aria-label", "Hermes");
+    ).toHaveAttribute("aria-label", "OLYMPUS");
     expect(
       view.container.querySelector(".chat-empty .profile-avatar-img"),
     ).toBeNull();

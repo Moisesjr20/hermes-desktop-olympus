@@ -82,5 +82,5 @@ export default {
   repBalanceTotal: "الإجمالي",
   repCreateSuccess: "تم إنشاء الحساب",
   repCreateExists: "لدى هذا الوكيل حساب بنكي بالفعل.",
-  repStatusForeign: "هذا الوكيل مرتبط بحساب Hermes One مختلف.",
+  repStatusForeign: "هذا الوكيل مرتبط بحساب OLYMPUS مختلف.",
 } as const;

@@ -63,5 +63,5 @@ export default {
   repBalanceTotal: "Toplam",
   repCreateSuccess: "Hesap oluşturuldu",
   repCreateExists: "Bu ajanın zaten bir banka hesabı var.",
-  repStatusForeign: "Bu ajan farklı bir Hermes One hesabına bağlı.",
+  repStatusForeign: "Bu ajan farklı bir OLYMPUS hesabına bağlı.",
 } as const;

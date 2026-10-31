@@ -85,7 +85,8 @@ jobs:
   beta_mac:
     name: Build macOS (${{ matrix.arch }})
     needs: prepare
-    if: needs.prepare.outputs.tag_exists == 'false'
+    # macOS build desativado pela OLYMPUS enquanto não há secrets de signing Apple.
+    if: false && needs.prepare.outputs.tag_exists == 'false'
     runs-on: macos-latest
     strategy:
       fail-fast: false
@@ -281,7 +282,7 @@ jobs:
 
   publish:
     name: Publish Beta Prerelease
-    needs: [prepare, beta_mac, beta_linux, beta_windows]
+    needs: [prepare, beta_linux, beta_windows]
     if: needs.prepare.outputs.is_dry_run == 'false' && needs.prepare.outputs.tag_exists == 'false'
     runs-on: ubuntu-latest
     steps:

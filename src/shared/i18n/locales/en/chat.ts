@@ -205,7 +205,7 @@ export default {
   followUs: {
     title: "Follow Us on X",
     description:
-      "Stay up to date with the latest Hermes One features, tips, and updates. Follow us on X!",
+      "Stay up to date with the latest OLYMPUS features, tips, and updates. Follow us on X!",
     follow: "Follow",
     notNow: "Not Now",
   },

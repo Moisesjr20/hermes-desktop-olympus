@@ -108,5 +108,5 @@ export default {
   repBalanceTotal: "Total",
   repCreateSuccess: "Account created",
   repCreateExists: "This agent already has a bank account.",
-  repStatusForeign: "This agent is linked to a different Hermes One account.",
+  repStatusForeign: "This agent is linked to a different OLYMPUS account.",
 } as const;

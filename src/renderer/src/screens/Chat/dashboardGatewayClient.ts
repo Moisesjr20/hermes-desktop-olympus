@@ -129,7 +129,7 @@ export class DashboardGatewayClient {
         } catch {
           // Best-effort teardown of the stalled socket.
         }
-        reject(new Error("Hermes dashboard WebSocket connection timed out"));
+        reject(new Error("OLYMPUS dashboard WebSocket connection timed out"));
       }, this.connectTimeoutMs);
 
       const failOpen = (event: Event): void => {
@@ -137,7 +137,7 @@ export class DashboardGatewayClient {
         settled = true;
         window.clearTimeout(timeout);
         if (this.socket === socket) this.socket = null;
-        reject(new Error(`Could not connect to Hermes dashboard WebSocket`));
+        reject(new Error(`Could not connect to OLYMPUS dashboard WebSocket`));
         this.options.onError?.(event);
       };
 
@@ -162,9 +162,9 @@ export class DashboardGatewayClient {
         if (!settled) {
           settled = true;
           window.clearTimeout(timeout);
-          reject(new Error("Hermes dashboard WebSocket closed"));
+          reject(new Error("OLYMPUS dashboard WebSocket closed"));
         }
-        this.rejectPending("Hermes dashboard WebSocket closed");
+        this.rejectPending("OLYMPUS dashboard WebSocket closed");
         this.options.onClose?.(event);
       });
     });
@@ -177,7 +177,7 @@ export class DashboardGatewayClient {
     const socket = this.socket;
     if (!socket || socket.readyState !== WebSocket.OPEN) {
       return Promise.reject(
-        new Error("Hermes dashboard WebSocket is not connected"),
+        new Error("OLYMPUS dashboard WebSocket is not connected"),
       );
     }
 
@@ -201,7 +201,7 @@ export class DashboardGatewayClient {
   close(): void {
     const socket = this.socket;
     this.socket = null;
-    this.rejectPending("Hermes dashboard WebSocket closed");
+    this.rejectPending("OLYMPUS dashboard WebSocket closed");
     if (
       socket &&
       (socket.readyState === WebSocket.CONNECTING ||

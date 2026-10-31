@@ -58,5 +58,5 @@ export default {
   repBalanceTotal: "总计",
   repCreateSuccess: "账户已开设",
   repCreateExists: "该智能体已有银行账户。",
-  repStatusForeign: "该智能体已关联到另一个 Hermes One 账户。",
+  repStatusForeign: "该智能体已关联到另一个 OLYMPUS 账户。",
 } as const;
