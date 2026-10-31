@@ -63,7 +63,9 @@ jobs:
   release_mac:
     name: Build macOS (${{ matrix.arch }})
     needs: prepare
-    if: needs.prepare.outputs.tag_exists == 'false'
+    # macOS build desativado pela OLYMPUS enquanto não há secrets de signing
+    # da Apple Developer (APPLE_API_KEY_*). Reativar quando configurar.
+    if: false && needs.prepare.outputs.tag_exists == 'false'
     runs-on: macos-latest
     strategy:
       fail-fast: false
@@ -280,7 +282,7 @@ jobs:
   publish:
     name: Publish Release
     needs:
-      [prepare, release_mac, release_linux, release_windows, generate_winget]
+      [prepare, release_linux, release_windows, generate_winget]
     if: needs.prepare.outputs.is_dry_run == 'false' && needs.prepare.outputs.tag_exists == 'false'
     runs-on: ubuntu-latest
     steps:
