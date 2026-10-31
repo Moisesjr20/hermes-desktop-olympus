@@ -1,0 +1,31 @@
+OLYMPUS Desktop
+Copyright (c) 2026 Moises Kyrius / Kyrius
+
+This product is a rebrand (visual + strings + splash + locales) of:
+
+  hermes-desktop
+  https://github.com/fathah/hermes-desktop
+  Copyright (c) Fathah
+  Licensed under MIT License
+
+Which itself integrates with:
+
+  hermes-agent (Nous Research)
+  https://github.com/NousResearch/hermes-agent
+
+  hermes-webui (nesquena)
+  https://github.com/nesquena/hermes-webui
+
+The MIT License of the upstream `fathah/hermes-desktop` is preserved
+in LICENSE and governs this derivative work.
+
+Modifications in this fork include:
+- Full visual rebrand to OLYMPUS brand (logo, colors, typography)
+- SplashScreen reimplemented as programmatic SVG + CSS animation
+- i18n strings in 31 locales updated from "Hermes One" to "OLYMPUS"
+- Application identifiers changed to com.kyrius.olympus
+- CI pipelines adapted for self-signed APK + signed releases
+- Security patches to resolve 10 npm vulnerabilities (see CHANGELOG.md)
+
+All modifications are documented in CHANGELOG.md and visible in the
+commit history on GitHub.
