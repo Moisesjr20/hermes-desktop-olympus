@@ -59,7 +59,7 @@ function SplashScreen({
         preload="auto"
         style={{ display: "block", objectFit: "cover" }}
       />
-      <img className="splash-logo" src={splashLogo} alt="Hermes One" />
+      <img className="splash-logo" src={splashLogo} alt="OLYMPUS" />
       {onSwitchToLocal && showEscape && (
         <div className="splash-escape">
           <span className="splash-escape-hint">Taking longer than usual?</span>
