@@ -303,6 +303,7 @@ jobs:
           merge-multiple: true
 
       - name: Generate macOS update metadata
+        if: false  # OLYMPUS: macOS build desativado — pula geração do latest-mac.yml
         env:
           VERSION: ${{ needs.prepare.outputs.version }}
         run: |
