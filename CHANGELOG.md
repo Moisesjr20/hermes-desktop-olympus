@@ -3,6 +3,44 @@
 Mudanças notáveis desde o fork do upstream `fathah/hermes-desktop`.
 Formato segue [Keep a Changelog](https://keepachangelog.com/).
 
+## v0.7.11-olympus.0 (2026-11-02) — Onda 1b.2: voz via OpenRouter (uma key só)
+
+Unifica STT + TTS em uma única chave OpenRouter. Users da v0.7.10
+(com Groq + OpenAI configurados) continuam funcionando sem mexer em nada.
+
+### Added
+- **OpenRouter como provedor cloud default** (`cloudVoice.ts`):
+  - STT via `/api/v1/audio/transcriptions` — 6 modelos (`whisper-large-v3-turbo`
+    default, `whisper-large-v3`, `whisper-1`, `gpt-4o-mini-transcribe`,
+    `gpt-4o-transcribe`, `google/chirp-3`)
+  - TTS via `/api/v1/audio/speech` — 3 modelos (`gpt-4o-mini-tts` default,
+    `gpt-4o-mini-tts-2025-12-15`, `mistralai/voxtral-mini-tts-2603`)
+  - 10 vozes OpenAI compatíveis
+  - Headers `HTTP-Referer` + `X-Title` identificam a app no dashboard OpenRouter
+- **Settings pane "Voz" redesign**:
+  - OpenRouter key em destaque (border laranja), model pickers STT + TTS
+  - Seção legacy Groq/OpenAI colapsada (abre só se v0.7.10 settings existir)
+  - Dica inline de voz PT-BR (nova/shimmer feminino, onyx masculino)
+- **PT language hint** passado automático no STT request (melhora accuracy
+  PT-BR em accentos brasileiros)
+
+### Changed
+- `useVoiceInput.ts`: precedência de STT agora é OpenRouter → Groq legacy →
+  backend. Antes era Groq → backend.
+- `speech-playback.ts`: precedência de TTS agora é OpenRouter → OpenAI legacy →
+  backend MiniMax. Antes era OpenAI → backend.
+- Mensagem de erro remota agora menciona OpenRouter em vez de OpenAI.
+
+### Deprecated
+- `transcribeViaGroq`, `synthesizeViaOpenAi`, `OPENAI_TTS_VOICES`,
+  `DEFAULT_OPENAI_VOICE`, `OpenAiTtsVoice` — mantidos pra retrocompat, mas
+  OpenRouter cobre tudo com uma key.
+
+### Nota
+Settings legacy (Groq key + OpenAI key da v0.7.10) continuam salvos e
+funcionam como fallback — nada quebra pra quem configurou antes. Se preencher
+OpenRouter key, ela tem precedência.
+
 ## v0.7.10-olympus.0 (2026-11-02) — Onda 1b: voz cloud (STT + TTS)
 
 Destrava voz em modo remoto (API server :8642 sem endpoints `/api/audio/*`).
