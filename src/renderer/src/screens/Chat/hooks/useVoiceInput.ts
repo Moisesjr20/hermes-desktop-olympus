@@ -113,6 +113,7 @@ export function useVoiceInput(
         const cloudCfg = readCloudVoiceSettings();
         const triedCloud = !!cloudCfg.openrouterKey || !!cloudCfg.groqKey;
         if (triedCloud) {
+          let cloudErr: Error | null = null;
           try {
             if (cloudCfg.openrouterKey) {
               text = await transcribeViaOpenRouter(
@@ -124,15 +125,33 @@ export function useVoiceInput(
             } else {
               text = await transcribeViaGroq(blob, cloudCfg.groqKey);
             }
-          } catch (cloudErr) {
+          } catch (err) {
+            cloudErr = err instanceof Error ? err : new Error(String(err));
             if (isFinal) {
-              const bytes = new Uint8Array(await blob.arrayBuffer());
-              text = await window.hermesAPI.transcribeAudio(
-                bytes,
-                blob.type,
-                profile,
-              );
+              // Tenta backend como fallback (só modo local tem).
+              try {
+                const bytes = new Uint8Array(await blob.arrayBuffer());
+                text = await window.hermesAPI.transcribeAudio(
+                  bytes,
+                  blob.type,
+                  profile,
+                );
+                cloudErr = null;
+              } catch (backendErr) {
+                // Backend tbm falhou — mostra o erro CLOUD (mais útil pro
+                // usuário saber o que configurar), com nota.
+                const backendMsg =
+                  backendErr instanceof Error
+                    ? backendErr.message
+                    : String(backendErr);
+                throw new Error(
+                  (cloudErr ? cloudErr.message : "cloud fail") +
+                    "\n\nFallback backend tbm falhou: " +
+                    backendMsg.slice(0, 150),
+                );
+              }
             } else {
+              // Interim: engole, próxima tentativa resolve.
               throw cloudErr;
             }
           }

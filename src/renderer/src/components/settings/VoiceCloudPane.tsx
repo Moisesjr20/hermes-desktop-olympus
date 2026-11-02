@@ -1,29 +1,23 @@
 import { useEffect, useState } from "react";
-import { Mic, Volume2, ExternalLink, Router } from "lucide-react";
+import { Mic, Volume2, ExternalLink, Router, RefreshCw } from "lucide-react";
 import {
   readCloudVoiceSettings,
   writeCloudVoiceSettings,
   TTS_VOICES,
   OPENROUTER_STT_MODELS,
   OPENROUTER_TTS_MODELS,
-  type TtsVoice,
-  type OpenRouterSttModel,
-  type OpenRouterTtsModel,
+  fetchOpenRouterModels,
 } from "../../screens/Chat/cloudVoice";
 
 /**
  * Settings de voz cloud via OpenRouter (default) com fallback pra chaves
- * legadas Groq+OpenAI (v0.7.10). Keys ficam só no renderer (localStorage).
+ * legadas Groq+OpenAI (v0.7.10). Carrega lista dinâmica de modelos quando abre.
  */
 export default function VoiceCloudPane(): React.JSX.Element {
   const [openrouterKey, setOpenrouterKey] = useState("");
-  const [sttModel, setSttModel] = useState<OpenRouterSttModel>(
-    "openai/whisper-large-v3-turbo",
-  );
-  const [ttsModel, setTtsModel] = useState<OpenRouterTtsModel>(
-    "openai/gpt-4o-mini-tts",
-  );
-  const [voice, setVoice] = useState<TtsVoice>("nova");
+  const [sttModel, setSttModel] = useState("openai/whisper-large-v3-turbo");
+  const [ttsModel, setTtsModel] = useState("openai/gpt-4o-mini-tts");
+  const [voice, setVoice] = useState("nova");
   const [autoPlay, setAutoPlay] = useState(false);
   const [showOR, setShowOR] = useState(false);
 
@@ -35,6 +29,25 @@ export default function VoiceCloudPane(): React.JSX.Element {
 
   const [saved, setSaved] = useState<"idle" | "ok">("idle");
 
+  const [sttModels, setSttModels] = useState<string[]>([
+    ...OPENROUTER_STT_MODELS,
+  ]);
+  const [ttsModels, setTtsModels] = useState<string[]>([
+    ...OPENROUTER_TTS_MODELS,
+  ]);
+  const [loadingModels, setLoadingModels] = useState(false);
+
+  const loadModels = async (): Promise<void> => {
+    setLoadingModels(true);
+    try {
+      const { stt, tts } = await fetchOpenRouterModels();
+      if (stt.length > 0) setSttModels(stt);
+      if (tts.length > 0) setTtsModels(tts);
+    } finally {
+      setLoadingModels(false);
+    }
+  };
+
   useEffect(() => {
     const cfg = readCloudVoiceSettings();
     setOpenrouterKey(cfg.openrouterKey);
@@ -45,6 +58,7 @@ export default function VoiceCloudPane(): React.JSX.Element {
     setGroqKey(cfg.groqKey);
     setOpenaiKey(cfg.openaiKey);
     if (cfg.groqKey || cfg.openaiKey) setShowLegacy(true);
+    void loadModels();
   }, []);
 
   const save = (): void => {
@@ -59,6 +73,44 @@ export default function VoiceCloudPane(): React.JSX.Element {
     });
     setSaved("ok");
     window.setTimeout(() => setSaved("idle"), 1500);
+  };
+
+  const testKey = async (): Promise<void> => {
+    if (!openrouterKey.trim()) {
+      alert("Cole a chave OpenRouter primeiro.");
+      return;
+    }
+    try {
+      const r = await fetch(
+        "https://openrouter.ai/api/v1/key",
+        {
+          headers: {
+            Authorization: "Bearer " + openrouterKey.trim(),
+          },
+        },
+      );
+      if (r.ok) {
+        const data = (await r.json()) as {
+          data?: { limit?: number; usage?: number; label?: string };
+        };
+        const d = data.data || {};
+        const limit = d.limit != null ? "$" + d.limit : "sem limite";
+        const used = d.usage != null ? "$" + d.usage.toFixed(4) : "?";
+        alert(
+          "✓ Key válida\n\nLabel: " +
+            (d.label || "(sem label)") +
+            "\nLimite: " +
+            limit +
+            "\nUsado: " +
+            used,
+        );
+      } else {
+        const body = await r.text().catch(() => "");
+        alert("✗ Key inválida (" + r.status + "): " + body.slice(0, 200));
+      }
+    } catch (e) {
+      alert("Falha de rede: " + (e instanceof Error ? e.message : String(e)));
+    }
   };
 
   const inputStyle: React.CSSProperties = {
@@ -95,10 +147,9 @@ export default function VoiceCloudPane(): React.JSX.Element {
           Voz Cloud (STT + TTS)
         </h2>
         <p style={{ opacity: 0.7, fontSize: 13, marginTop: 6 }}>
-          Uma chave OpenRouter cobre entrada por voz (Whisper, GPT-4o
-          Transcribe, Chirp 3) e leitura das respostas (OpenAI TTS, Mistral
-          Voxtral, Gemini TTS). Billing centralizado, zero markup. As chaves
-          ficam só neste computador.
+          Uma chave OpenRouter cobre {sttModels.length} modelos STT (incluindo
+          NVIDIA Nemotron/Parakeet, Whisper, GPT-4o Transcribe, Chirp, Nova-3) e{" "}
+          {ttsModels.length} modelos TTS. As chaves ficam só neste computador.
         </p>
       </header>
 
@@ -120,7 +171,7 @@ export default function VoiceCloudPane(): React.JSX.Element {
             fontWeight: 600,
           }}
         >
-          <Router size={16} /> OpenRouter API Key (recomendado — uma só pra STT + TTS)
+          <Router size={16} /> OpenRouter API Key
           <a
             href="https://openrouter.ai/keys"
             target="_blank"
@@ -145,8 +196,56 @@ export default function VoiceCloudPane(): React.JSX.Element {
             placeholder="sk-or-v1-..."
             style={inputStyle}
           />
-          <button type="button" onClick={() => setShowOR((v) => !v)} style={toggleBtnStyle}>
+          <button
+            type="button"
+            onClick={() => setShowOR((v) => !v)}
+            style={toggleBtnStyle}
+          >
             {showOR ? "ocultar" : "mostrar"}
+          </button>
+          <button
+            type="button"
+            onClick={testKey}
+            style={{
+              ...toggleBtnStyle,
+              borderColor: "var(--accent, #f59e0b)",
+            }}
+          >
+            Testar key
+          </button>
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            fontSize: 12,
+            opacity: 0.7,
+          }}
+        >
+          <span>
+            {loadingModels
+              ? "Carregando modelos..."
+              : `${sttModels.length} STT + ${ttsModels.length} TTS disponíveis`}
+          </span>
+          <button
+            type="button"
+            onClick={loadModels}
+            disabled={loadingModels}
+            style={{
+              marginLeft: "auto",
+              background: "transparent",
+              border: "none",
+              color: "inherit",
+              cursor: "pointer",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 4,
+            }}
+            title="Recarregar lista de modelos do OpenRouter"
+          >
+            <RefreshCw size={12} /> atualizar
           </button>
         </div>
 
@@ -158,46 +257,70 @@ export default function VoiceCloudPane(): React.JSX.Element {
             marginTop: 4,
           }}
         >
-          <label style={{ display: "flex", flexDirection: "column", gap: 4, fontSize: 13 }}>
+          <label
+            style={{ display: "flex", flexDirection: "column", gap: 4, fontSize: 13 }}
+          >
             <strong>
-              <Mic size={12} style={{ marginRight: 4, verticalAlign: "middle" }} /> Modelo STT
+              <Mic
+                size={12}
+                style={{ marginRight: 4, verticalAlign: "middle" }}
+              />{" "}
+              Modelo STT
             </strong>
             <select
               value={sttModel}
-              onChange={(e) => setSttModel(e.target.value as OpenRouterSttModel)}
+              onChange={(e) => setSttModel(e.target.value)}
               style={{
                 padding: "6px 8px",
                 borderRadius: 6,
                 border: "1px solid var(--border, #333)",
                 background: "transparent",
                 color: "inherit",
+                fontFamily: "monospace",
+                fontSize: 12,
               }}
             >
-              {OPENROUTER_STT_MODELS.map((m) => (
-                <option key={m} value={m}>
+              {sttModels.map((m) => (
+                <option
+                  key={m}
+                  value={m}
+                  style={{ background: "var(--card, #0a1628)", color: "inherit" }}
+                >
                   {m}
                 </option>
               ))}
             </select>
           </label>
 
-          <label style={{ display: "flex", flexDirection: "column", gap: 4, fontSize: 13 }}>
+          <label
+            style={{ display: "flex", flexDirection: "column", gap: 4, fontSize: 13 }}
+          >
             <strong>
-              <Volume2 size={12} style={{ marginRight: 4, verticalAlign: "middle" }} /> Modelo TTS
+              <Volume2
+                size={12}
+                style={{ marginRight: 4, verticalAlign: "middle" }}
+              />{" "}
+              Modelo TTS
             </strong>
             <select
               value={ttsModel}
-              onChange={(e) => setTtsModel(e.target.value as OpenRouterTtsModel)}
+              onChange={(e) => setTtsModel(e.target.value)}
               style={{
                 padding: "6px 8px",
                 borderRadius: 6,
                 border: "1px solid var(--border, #333)",
                 background: "transparent",
                 color: "inherit",
+                fontFamily: "monospace",
+                fontSize: 12,
               }}
             >
-              {OPENROUTER_TTS_MODELS.map((m) => (
-                <option key={m} value={m}>
+              {ttsModels.map((m) => (
+                <option
+                  key={m}
+                  value={m}
+                  style={{ background: "var(--card, #0a1628)", color: "inherit" }}
+                >
                   {m}
                 </option>
               ))}
@@ -217,7 +340,7 @@ export default function VoiceCloudPane(): React.JSX.Element {
           Voz:
           <select
             value={voice}
-            onChange={(e) => setVoice(e.target.value as TtsVoice)}
+            onChange={(e) => setVoice(e.target.value)}
             style={{
               padding: "4px 8px",
               borderRadius: 6,
@@ -227,28 +350,31 @@ export default function VoiceCloudPane(): React.JSX.Element {
             }}
           >
             {TTS_VOICES.map((v) => (
-              <option key={v} value={v}>
+              <option
+                key={v}
+                value={v}
+                style={{ background: "var(--card, #0a1628)", color: "inherit" }}
+              >
                 {v}
               </option>
             ))}
           </select>
           <span style={{ opacity: 0.5, fontSize: 12 }}>
-            (nova/shimmer são boas pra PT-BR feminino; onyx pra masculino grave)
+            (nova/shimmer bons pra PT-BR fem.; onyx masculino. Vozes variam por
+            modelo TTS)
           </span>
         </label>
 
-        <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13 }}>
+        <label
+          style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13 }}
+        >
           <input
             type="checkbox"
             checked={autoPlay}
             onChange={(e) => setAutoPlay(e.target.checked)}
           />
-          Tocar automaticamente respostas do agente (auto-play TTS)
+          Tocar automaticamente respostas do agente (auto-play TTS — Onda 1c)
         </label>
-
-        <p style={{ fontSize: 12, opacity: 0.6, margin: 0 }}>
-          Custo típico OpenRouter: STT ~$0.0001/sec (Whisper turbo), TTS ~$0.015/1k chars.
-        </p>
       </section>
 
       <section>
@@ -265,7 +391,8 @@ export default function VoiceCloudPane(): React.JSX.Element {
             padding: 0,
           }}
         >
-          {showLegacy ? "▼" : "▶"} Fallback: chaves Groq + OpenAI (legacy v0.7.10)
+          {showLegacy ? "▼" : "▶"} Fallback: chaves Groq + OpenAI (legacy
+          v0.7.10)
         </button>
         {showLegacy && (
           <div
@@ -281,7 +408,7 @@ export default function VoiceCloudPane(): React.JSX.Element {
           >
             <p style={{ fontSize: 12, opacity: 0.6, margin: 0 }}>
               Usadas só se OpenRouter key estiver vazia. Mantidas pra
-              retrocompatibilidade — recomendamos migrar pra OpenRouter.
+              retrocompatibilidade.
             </p>
             <label style={{ fontWeight: 600, fontSize: 13 }}>Groq (STT)</label>
             <div style={{ display: "flex", gap: 8 }}>
@@ -292,7 +419,11 @@ export default function VoiceCloudPane(): React.JSX.Element {
                 placeholder="gsk_..."
                 style={inputStyle}
               />
-              <button type="button" onClick={() => setShowGroq((v) => !v)} style={toggleBtnStyle}>
+              <button
+                type="button"
+                onClick={() => setShowGroq((v) => !v)}
+                style={toggleBtnStyle}
+              >
                 {showGroq ? "ocultar" : "mostrar"}
               </button>
             </div>
@@ -307,7 +438,11 @@ export default function VoiceCloudPane(): React.JSX.Element {
                 placeholder="sk-..."
                 style={inputStyle}
               />
-              <button type="button" onClick={() => setShowOpenai((v) => !v)} style={toggleBtnStyle}>
+              <button
+                type="button"
+                onClick={() => setShowOpenai((v) => !v)}
+                style={toggleBtnStyle}
+              >
                 {showOpenai ? "ocultar" : "mostrar"}
               </button>
             </div>
@@ -332,7 +467,9 @@ export default function VoiceCloudPane(): React.JSX.Element {
           Salvar
         </button>
         {saved === "ok" && (
-          <span style={{ fontSize: 13, color: "var(--accent, #f59e0b)" }}>✓ Salvo</span>
+          <span style={{ fontSize: 13, color: "var(--accent, #f59e0b)" }}>
+            ✓ Salvo
+          </span>
         )}
       </div>
 
@@ -344,21 +481,26 @@ export default function VoiceCloudPane(): React.JSX.Element {
           paddingTop: 12,
         }}
       >
-        <strong>Como funciona:</strong>
+        <strong>Dicas:</strong>
         <ul style={{ marginTop: 6, paddingLeft: 20 }}>
           <li>
-            Hotkey <code>Ctrl+Shift+V</code> (ou botão mic) grava, OpenRouter
-            transcreve com o modelo escolhido, texto cai no composer.
+            <strong>NVIDIA Parakeet TDT 0.6b</strong> ou{" "}
+            <strong>Nemotron 3.5 ASR Streaming</strong> dão ótimo PT-BR a custo
+            baixo.
           </li>
           <li>
-            Botão 🔊 em cada resposta usa OpenRouter TTS com voz escolhida
-            (fallback: OpenAI direto → MiniMax backend em modo Local).
+            <strong>Deepgram Nova-3</strong> é referência pra latência (ASR em
+            tempo real).
           </li>
           <li>
-            Com OpenRouter configurado, você pode trocar entre Whisper
-            (barato/rápido), GPT-4o Transcribe (melhor accuracy) e Chirp 3
-            (Google) sem mexer em código.
+            <strong>Mistral Voxtral Small Transcribe</strong> é bom pra áudios
+            longos.
           </li>
+          <li>
+            TTS: <strong>Mistral Voxtral Mini TTS</strong> e{" "}
+            <strong>ElevenLabs Flash v2.5</strong> têm latência &lt; 500ms.
+          </li>
+          <li>Hotkey PTT: <code>Ctrl+Shift+V</code> em qualquer app.</li>
         </ul>
       </aside>
     </div>
