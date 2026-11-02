@@ -100,20 +100,32 @@ export function useVoiceInput(
         const blob = new Blob(chunksRef.current, { type });
         if (blob.size === 0) return;
 
-        // Onda 1b: tenta cloud STT (Groq Whisper) primeiro se configurado.
-        // Resolve o problema do modo remoto onde /api/audio/transcribe = 404.
-        // Interims só vão pro cloud (Groq é cheap/fast); fallback main só no final.
+        // Onda 1b/1c: tenta cloud STT. Precedência:
+        //   1) OpenRouter (nova default — uma key cobre tudo)
+        //   2) Groq (legacy v0.7.10)
+        //   3) backend transcribeAudio (modo Local)
         let text = "";
-        const { readCloudVoiceSettings, transcribeViaGroq } = await import(
-          "../cloudVoice"
-        );
+        const {
+          readCloudVoiceSettings,
+          transcribeViaOpenRouter,
+          transcribeViaGroq,
+        } = await import("../cloudVoice");
         const cloudCfg = readCloudVoiceSettings();
-        if (cloudCfg.groqKey) {
+        const triedCloud = !!cloudCfg.openrouterKey || !!cloudCfg.groqKey;
+        if (triedCloud) {
           try {
-            text = await transcribeViaGroq(blob, cloudCfg.groqKey);
+            if (cloudCfg.openrouterKey) {
+              text = await transcribeViaOpenRouter(
+                blob,
+                cloudCfg.openrouterKey,
+                cloudCfg.sttModel,
+                "pt",
+              );
+            } else {
+              text = await transcribeViaGroq(blob, cloudCfg.groqKey);
+            }
           } catch (cloudErr) {
             if (isFinal) {
-              // Em final, cai pro backend como fallback — pode ter outra chance.
               const bytes = new Uint8Array(await blob.arrayBuffer());
               text = await window.hermesAPI.transcribeAudio(
                 bytes,
@@ -121,7 +133,6 @@ export function useVoiceInput(
                 profile,
               );
             } else {
-              // Interim: engole erro silenciosamente, próxima tentativa resolve.
               throw cloudErr;
             }
           }
