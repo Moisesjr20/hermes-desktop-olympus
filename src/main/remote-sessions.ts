@@ -254,7 +254,9 @@ function normalizeCachedSession(row: RemoteRecord): CachedSession {
 
 function sessionsFromResponse(response: unknown): RemoteRecord[] {
   const record = asRecord(response);
-  return asArray(record.sessions);
+  // Dashboard shape: { sessions: [...] }
+  // API server (OpenAI-compatible, :8642) shape: { object: "list", data: [...] }
+  return asArray(record.sessions ?? record.data);
 }
 
 async function remoteSessionListPage(
@@ -477,7 +479,12 @@ export async function remoteGetSessionMessages(
     config,
     `/api/sessions/${encodeURIComponent(sessionId)}/messages`,
   );
-  const rows = asArray(asRecord(response).messages).map(normalizeMessageRow);
+  const responseRecord = asRecord(response);
+  // Dashboard shape: { messages: [...] }
+  // API server (:8642) shape: { object: "list", data: [...] }
+  const rows = asArray(responseRecord.messages ?? responseRecord.data).map(
+    normalizeMessageRow,
+  );
   return hydrateRemotePromptImageAttachments(config, expandRowsToHistory(rows));
 }
 

@@ -3,6 +3,15 @@
 Mudanças notáveis desde o fork do upstream `fathah/hermes-desktop`.
 Formato segue [Keep a Changelog](https://keepachangelog.com/).
 
+## v0.7.8-olympus.5 (2026-11-02)
+
+### Fixed
+- **Sidebar "Chats" vazia** quando desktop conecta no API server OpenAI-compatible (:8642).
+  `sessionsFromResponse` e `remoteGetSessionMessages` só reconheciam o shape do Dashboard
+  (`{sessions:[...]}` / `{messages:[...]}`); agora aceitam também o shape OpenAI
+  (`{object:"list",data:[...]}`) via `?? record.data`.
+- Teste de regressão `tests/sessions-shape-compat.test.ts` (5 asserts) trava os dois shapes.
+
 ## v0.7.8-olympus.4 (2026-11-02)
 
 ### Build
