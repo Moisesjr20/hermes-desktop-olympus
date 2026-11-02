@@ -3,6 +3,44 @@
 Mudanças notáveis desde o fork do upstream `fathah/hermes-desktop`.
 Formato segue [Keep a Changelog](https://keepachangelog.com/).
 
+## v0.7.11-olympus.1 (2026-11-02) — Onda 1b.3: 29 STT + 38 TTS + "Testar key"
+
+Fix do erro "modo remoto não expõe /api/audio/transcribe" aparecendo mesmo com
+OpenRouter configurado (mascarava o erro cloud real) + expansão da lista de
+modelos pra incluir NVIDIA, ElevenLabs, AssemblyAI, Deepgram, Microsoft MAI,
+Fish Audio, Qwen, Grok, HeyGen e os open-weight (Kokoro, Orpheus, CSM).
+
+### Added
+- **Lista dinâmica de modelos** via `fetchOpenRouterModels()` — carrega
+  `/api/v1/models?output_modalities=transcription|speech` do OpenRouter
+  (cache TTL 5min). Modelos novos (ex: NVIDIA Parakeet TDT 0.6b v3,
+  Nemotron 3.5 Transcribe) aparecem sem precisar atualizar a app.
+- **Lista hardcoded expandida** (fallback se API falha): **29 STT** + **38 TTS**
+  modelos — snapshot 2026-11-02. NVIDIA, ElevenLabs, AssemblyAI, Deepgram,
+  Microsoft MAI, Qwen, Grok, Mistral Voxtral, Fish Audio, Google Chirp/Gemini,
+  Kokoro, Orpheus, CSM etc.
+- **Botão "Testar key"** no VoiceCloudPane — chama `/api/v1/key` do OpenRouter
+  e mostra label + limite + usado. Facilita diagnóstico de chave inválida.
+- **Botão "atualizar" lista** de modelos (reload dinâmico sob demanda).
+- Dica inline sugerindo modelos específicos pra PT-BR (NVIDIA Parakeet,
+  Nemotron ASR Streaming) e low-latency TTS (Mistral Voxtral Mini,
+  ElevenLabs Flash v2.5).
+
+### Fixed
+- **Erro de fallback mascarado** — quando cloud STT falhava (ex: 401, 400,
+  rede), o `useVoiceInput` caía silenciosamente no backend que mostrava
+  "modo remoto não expõe /api/audio/transcribe". Agora:
+  1. Tenta cloud OpenRouter/Groq
+  2. Se falhar E modo for Local → tenta backend
+  3. Se backend tbm falhar → mostra o erro CLOUD original (com stack HTTP:
+     status + body), não o backend
+- `transcribeViaOpenRouter` + `synthesizeViaOpenRouter` agora incluem o nome
+  do modelo + status HTTP + body (300 chars) na mensagem de erro.
+
+### Changed
+- `OpenRouterSttModel` + `OpenRouterTtsModel` agora são `string` (não union
+  literal fechado) — permite modelos descobertos dinamicamente.
+
 ## v0.7.11-olympus.0 (2026-11-02) — Onda 1b.2: voz via OpenRouter (uma key só)
 
 Unifica STT + TTS em uma única chave OpenRouter. Users da v0.7.10
