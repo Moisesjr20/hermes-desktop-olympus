@@ -5,6 +5,7 @@ import {
   FileText,
   Info,
   Languages,
+  Mic,
   Palette,
   PawPrint,
   Plug,
@@ -17,6 +18,7 @@ import { AppModal, AppModalTitle } from "../modal/AppModal";
 import { useSettingsData } from "./useSettingsData";
 import { SettingsDataContext } from "./SettingsDataContext";
 import AppearancePane from "./AppearancePane";
+import VoiceCloudPane from "./VoiceCloudPane";
 import LanguagePane from "./LanguagePane";
 import PrivacyPane from "./PrivacyPane";
 import ConnectionPane from "./ConnectionPane";
@@ -34,6 +36,7 @@ export type SettingsSection =
   | "notifications"
   | "privacy"
   | "connection"
+  | "voice"
   | "data"
   | "about"
   | "community"
@@ -83,6 +86,12 @@ const SETTINGS_NAV: ReadonlyArray<{
     id: "connection",
     labelKey: "settings.nav.connection",
     Icon: Plug,
+  },
+  {
+    group: "general",
+    id: "voice",
+    labelKey: "settings.nav.voice",
+    Icon: Mic,
   },
   {
     group: "general",
@@ -225,6 +234,7 @@ export default function SettingsModal({
             {section === "notifications" && <NotificationsPane />}
             {section === "privacy" && <PrivacyPane />}
             {section === "connection" && <ConnectionPane />}
+            {section === "voice" && <VoiceCloudPane />}
             {section === "data" && <DataPane />}
             {section === "about" && (
               <AboutPane

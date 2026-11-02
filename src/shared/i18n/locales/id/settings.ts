@@ -14,6 +14,7 @@ export default {
     appearance: "Tampilan",
     language: "Bahasa",
     privacy: "Privasi",
+    voice: "Voice",
     connection: "Koneksi",
     network: "Jaringan",
     data: "Data",

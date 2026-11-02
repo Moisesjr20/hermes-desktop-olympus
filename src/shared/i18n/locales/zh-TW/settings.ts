@@ -14,6 +14,7 @@ export default {
     appearance: "外觀",
     language: "語言",
     privacy: "隱私",
+    voice: "Voice",
     connection: "連線",
     network: "網路",
     data: "資料",

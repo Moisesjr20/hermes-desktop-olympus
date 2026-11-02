@@ -14,6 +14,7 @@ export default {
     appearance: "外観",
     language: "言語",
     privacy: "プライバシー",
+    voice: "Voice",
     connection: "接続",
     network: "ネットワーク",
     data: "データ",

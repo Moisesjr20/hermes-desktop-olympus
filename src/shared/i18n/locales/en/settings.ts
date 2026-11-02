@@ -16,6 +16,7 @@ export default {
     pets: "Pets",
     notifications: "Notifications",
     privacy: "Privacy",
+    voice: "Voice",
     connection: "Connection",
     network: "Network",
     data: "Data",

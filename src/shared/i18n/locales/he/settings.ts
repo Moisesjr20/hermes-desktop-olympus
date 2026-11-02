@@ -14,6 +14,7 @@ export default {
     appearance: "מראה",
     language: "שפה",
     privacy: "פרטיות",
+    voice: "Voice",
     connection: "חיבור",
     network: "רשת",
     data: "נתונים",

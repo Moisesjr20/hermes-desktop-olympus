@@ -14,6 +14,7 @@ export default {
     appearance: "Görünüm",
     language: "Dil",
     privacy: "Gizlilik",
+    voice: "Voice",
     connection: "Bağlantı",
     network: "Ağ",
     data: "Veri",

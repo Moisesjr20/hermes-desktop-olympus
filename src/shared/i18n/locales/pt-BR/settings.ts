@@ -15,6 +15,7 @@ export default {
     language: "Idioma",
     pets: "Mascotes",
     privacy: "Privacidade",
+    voice: "Voz",
     connection: "Conexão",
     network: "Rede",
     data: "Dados",

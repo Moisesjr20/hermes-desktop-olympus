@@ -106,9 +106,49 @@ export async function startSpeechPlayback(
     const target =
       await window.hermesAPI.getProviderRequestTarget(connectionId);
     if (current !== playback) return;
+
+    // Onda 1b: branch cloud OpenAI TTS quando configurado — destrava modo remoto.
+    // Precedência: OpenAI cloud (se key preenchida) > backend MiniMax (só local).
+    const { readCloudVoiceSettings, synthesizeViaOpenAi } = await import(
+      "./cloudVoice"
+    );
+    const cloudCfg = readCloudVoiceSettings();
+    if (cloudCfg.openaiKey) {
+      try {
+        const blob = await synthesizeViaOpenAi(
+          text,
+          cloudCfg.openaiKey,
+          cloudCfg.voice,
+        );
+        if (current !== playback) return;
+        const url = URL.createObjectURL(blob);
+        const audio = new Audio(url);
+        Object.assign(playback, { audio, url });
+        audio.onended = () => {
+          if (current === playback) stopSpeechPlayback(owner);
+        };
+        audio.onerror = () =>
+          fail(
+            playback,
+            new Error("Falha ao tocar o áudio OpenAI; verifique saída."),
+          );
+        await audio.play();
+        if (current !== playback) {
+          audio.pause();
+          return;
+        }
+        publish({ owner, stage: "playing", error: null });
+        return;
+      } catch (cloudErr) {
+        // Falha cloud → cai no backend (ou erro final se não for local)
+        console.warn("[CLOUD TTS] Falhou, tentando fallback backend:", cloudErr);
+      }
+    }
+
     if (target.mode !== "local")
       throw new Error(
-        "Speech playback is available only on a Local connection.",
+        "TTS local requer conexão Local. Configure OpenAI key em Settings → " +
+          "Voz Cloud pra usar TTS em modo remoto.",
       );
     playback.dispatched = true;
     const result = await window.hermesAPI.synthesizeSpeech({
