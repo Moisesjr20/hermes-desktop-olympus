@@ -3,6 +3,12 @@
 Mudanças notáveis desde o fork do upstream `fathah/hermes-desktop`.
 Formato segue [Keep a Changelog](https://keepachangelog.com/).
 
+## v0.7.8-olympus.4 (2026-11-02)
+
+### Build
+- Release build Linux (AppImage + deb + rpm, x64 + arm64) + Windows (NSIS + portable x64).
+- Testes de identidade OLYMPUS: 26/26 passam.
+
 ## v0.7.8-olympus.3 (2026-10-31)
 
 ### Added
