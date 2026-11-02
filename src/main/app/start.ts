@@ -21,6 +21,8 @@ import { setGatewayPromptParent } from "../gatewayPrompt";
 import { showChatContextMenu } from "./context-menu";
 import { buildMenu } from "./menu";
 import { setupUpdater } from "./updater";
+import { createTray, destroyTray } from "./tray";
+import { registerGlobalShortcuts } from "./global-shortcuts";
 
 const APP_NAME = process.env.HERMES_DESKTOP_APP_NAME?.trim() || "OLYMPUS";
 const OPEN_DEVTOOLS_ON_START =
@@ -108,6 +110,30 @@ export function startMainProcess(): void {
     createWindow();
     buildMenu({ getMainWindow: () => mainWindow, openExternalUrl });
 
+    // Tray + global shortcuts (Onda 0 — presença ambiente)
+    const showMainWindow = (): void => {
+      if (!mainWindow || mainWindow.isDestroyed()) {
+        createWindow();
+        return;
+      }
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.show();
+      mainWindow.focus();
+    };
+    const startNewSession = (): void => {
+      mainWindow?.webContents.send("menu-new-chat");
+    };
+    createTray({
+      getMainWindow: () => mainWindow,
+      showMainWindow,
+      startNewSession,
+    });
+    registerGlobalShortcuts({
+      getMainWindow: () => mainWindow,
+      showMainWindow,
+      startNewSession,
+    });
+
     app.on("activate", () => {
       if (BrowserWindow.getAllWindows().length === 0) createWindow();
     });
@@ -115,6 +141,10 @@ export function startMainProcess(): void {
 
   app.on("window-all-closed", () => {
     if (process.platform !== "darwin") app.quit();
+  });
+
+  app.on("before-quit", () => {
+    destroyTray();
   });
 
   registerManagedQuit(

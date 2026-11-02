@@ -478,6 +478,48 @@ export async function processFiles(
           // Extração falhou (PDF corrompido, criptografado) → erro padrão.
         }
       }
+
+      // Office docs (.docx / .xlsx) — extrai client-side via mammoth / xlsx.
+      const isDocx =
+        /\.docx$/i.test(name) ||
+        mime ===
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+      const isXlsx =
+        /\.xlsx$/i.test(name) ||
+        mime ===
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+      if (isDocx || isXlsx) {
+        try {
+          const { extractDocxText, extractXlsxText } = await import(
+            "./officeExtract"
+          );
+          const extracted = isDocx
+            ? await extractDocxText(file)
+            : await extractXlsxText(file);
+          if (extracted.charCount > 0) {
+            const header = isDocx
+              ? `[DOCX extraído client-side — ${extracted.charCount} caracteres]\n\n`
+              : `[XLSX extraído client-side — ${extracted.sheetCount ?? "?"} sheet(s), ${extracted.charCount} caracteres]\n\n`;
+            const combined = header + extracted.text;
+            if (combined.length > MAX_TEXT_BYTES) {
+              errors.push({ code: "text-too-large", filename: name });
+              continue;
+            }
+            attachments.push({
+              id: newId(),
+              kind: "text-file",
+              name: `${name}.txt`,
+              mime: "text/plain",
+              size: combined.length,
+              text: combined,
+            });
+            continue;
+          }
+        } catch {
+          // Falhou → erro padrão abaixo.
+        }
+      }
+
       errors.push({ code: "remote-mode-binary", filename: name });
       continue;
     }

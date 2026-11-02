@@ -3,6 +3,29 @@
 Mudanças notáveis desde o fork do upstream `fathah/hermes-desktop`.
 Formato segue [Keep a Changelog](https://keepachangelog.com/).
 
+## v0.7.9-olympus.0 (2026-11-02) — Onda 0: presença ambiente
+
+### Added
+- **Global hotkeys** (`src/main/app/global-shortcuts.ts`):
+  - `Cmd/Ctrl+Shift+O` → toggle janela OLYMPUS (abre se escondida, esconde se visível/focada)
+  - `Cmd/Ctrl+Shift+N` → mostra janela + nova sessão
+- **System tray** (`src/main/app/tray.ts`):
+  - Ícone OLYMPUS persistente no tray
+  - Click simples → toggle janela
+  - Right-click → menu (Mostrar / Nova sessão / Sair)
+  - Funciona com janela fechada (app continua residente)
+- **Extração de .docx client-side** via `mammoth` — arrasta Word no modo remoto, vira text-file inline
+- **Extração de .xlsx client-side** via `xlsx` (SheetJS) — cada sheet vira seção CSV no text-file
+- `src/renderer/src/screens/Chat/officeExtract.ts` — util com dynamic import (bundle inicial não cresce)
+
+### Changed
+- **Updater (electron-builder.yml):** `publish.owner/repo` apontam para o fork `Moisesjr20/hermes-desktop-olympus` — OTA do fork fica funcional (releases publicadas aqui serão detectadas pelo auto-updater).
+- `attachmentUtils.ts`: pipeline de modo remoto agora cobre PDF + DOCX + XLSX antes de bloquear binários.
+
+### Deps
+- `+ mammoth ^1.11.0`
+- `+ xlsx ^0.18.5`
+
 ## v0.7.8-olympus.6 (2026-11-02)
 
 ### Added
