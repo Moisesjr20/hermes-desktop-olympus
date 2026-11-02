@@ -3,6 +3,19 @@
 Mudanças notáveis desde o fork do upstream `fathah/hermes-desktop`.
 Formato segue [Keep a Changelog](https://keepachangelog.com/).
 
+## v0.7.8-olympus.6 (2026-11-02)
+
+### Added
+- **Upload de PDFs no modo remoto** — PDFs textuais (extratos, contratos, docs) são
+  extraídos client-side via `pdfjs-dist` e enviados inline como `text-file`.
+  Zero config nova, zero mudança no backend.
+  - `src/renderer/src/screens/Chat/pdfTextExtract.ts` — util com dynamic import
+    (bundle inicial não cresce)
+  - `attachmentUtils.ts`: antes de retornar `remote-mode-binary`, tenta extração.
+    Sucesso (`charCount > 0`) → vira text-file com header `[PDF extraído client-side …]`.
+    Falha / scan só-imagem → cai no erro original.
+- Dependência runtime: `pdfjs-dist@^6.5.438` (Mozilla, estável).
+
 ## v0.7.8-olympus.5 (2026-11-02)
 
 ### Fixed

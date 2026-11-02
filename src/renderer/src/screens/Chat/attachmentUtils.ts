@@ -447,6 +447,37 @@ export async function processFiles(
     // read via its own file tools.  Requires a filesystem path that's
     // valid on the agent's host.
     if (options.remoteMode) {
+      // PDFs textuais podem ser extraídos no cliente e enviados inline
+      // como text-file — não precisam de filesystem no agente.
+      // Scans/PDFs só-imagem retornam charCount=0 e caem no erro original.
+      if (mime === "application/pdf" || /\.pdf$/i.test(name)) {
+        try {
+          const { extractPdfText } = await import("./pdfTextExtract");
+          const extracted = await extractPdfText(file);
+          if (extracted.charCount > 0) {
+            const header =
+              `[PDF extraído client-side — ${extracted.pageCount} página(s), ` +
+              `${extracted.charCount} caracteres]\n\n`;
+            const combined = header + extracted.text;
+            if (combined.length > MAX_TEXT_BYTES) {
+              errors.push({ code: "text-too-large", filename: name });
+              continue;
+            }
+            attachments.push({
+              id: newId(),
+              kind: "text-file",
+              name: `${name}.txt`,
+              mime: "text/plain",
+              size: combined.length,
+              text: combined,
+            });
+            continue;
+          }
+          // charCount === 0 → PDF só com imagens/scan; cai no erro padrão.
+        } catch {
+          // Extração falhou (PDF corrompido, criptografado) → erro padrão.
+        }
+      }
       errors.push({ code: "remote-mode-binary", filename: name });
       continue;
     }
