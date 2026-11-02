@@ -3,6 +3,14 @@
 Mudanças notáveis desde o fork do upstream `fathah/hermes-desktop`.
 Formato segue [Keep a Changelog](https://keepachangelog.com/).
 
+## v0.7.11-olympus.2 (2026-11-02) — Hotfix: CSP permite OpenRouter
+
+### Fixed
+- **"Falha de rede: Failed to fetch"** em Settings → Voz "Testar key" (e em todo STT/TTS cloud) era o CSP (`<meta>` do index.html) bloqueando domínios externos.
+  - Antes: `connect-src ... https://*.hermesone.org wss:` (só esse domínio HTTPS)
+  - Agora: `connect-src ... https: wss:` (igual ao runtime CSP já aberto em start.ts)
+- Agora `fetch` pra `https://openrouter.ai`, `https://api.openai.com`, `https://api.groq.com` etc funciona do renderer.
+
 ## v0.7.11-olympus.1 (2026-11-02) — Onda 1b.3: 29 STT + 38 TTS + "Testar key"
 
 Fix do erro "modo remoto não expõe /api/audio/transcribe" aparecendo mesmo com

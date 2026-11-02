@@ -1,6 +1,6 @@
 {
   "name": "olympus-desktop",
-  "version": "0.7.11-olympus.1",
+  "version": "0.7.11-olympus.2",
   "description": "OLYMPUS Desktop — Hermes-powered multi-agent experience by Moises Kyrius",
   "main": "./out/main/index.js",
   "author": "fathah",
