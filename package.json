@@ -1,6 +1,6 @@
 {
   "name": "olympus-desktop",
-  "version": "0.7.8-olympus.6",
+  "version": "0.7.9-olympus.0",
   "description": "OLYMPUS Desktop — Hermes-powered multi-agent experience by Moises Kyrius",
   "main": "./out/main/index.js",
   "author": "fathah",
@@ -48,6 +48,7 @@
     "i18next": "^25.6.0",
     "js-yaml": "^4.3.2",
     "lucide-react": "^1.7.0",
+    "mammoth": "^1.11.0",
     "motion": "^12.40.0",
     "pdfjs-dist": "^6.5.438",
     "react-hot-toast": "^2.6.0",
@@ -58,7 +59,8 @@
     "thinking-orbs": "^0.1.1",
     "three": "^0.183.2",
     "troika-three-text": "^0.52.4",
-    "ws": "^8.20.0"
+    "ws": "^8.20.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config-prettier": "^3.0.0",
