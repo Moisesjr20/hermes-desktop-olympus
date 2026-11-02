@@ -159,6 +159,18 @@ export const ChatInput = forwardRef<ChatInputHandle, ChatInputProps>(
     );
     const voice = useVoiceInput(handleVoiceResult, profile);
 
+    // Hotkey global Cmd/Ctrl+Shift+V (Onda 1) chega aqui via IPC — toggle do mic.
+    // Mesmo contrato que o botão de mic do composer.
+    useEffect(() => {
+      const cleanup = window.hermesAPI.onToggleVoice(() => {
+        if (!voice.recording && !voice.transcribing) {
+          inputRef.current?.focus();
+        }
+        voice.toggle();
+      });
+      return cleanup;
+    }, [voice]);
+
     const autoResize = useCallback((): void => {
       const el = inputRef.current;
       if (!el) return;

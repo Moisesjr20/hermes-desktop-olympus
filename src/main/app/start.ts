@@ -123,6 +123,9 @@ export function startMainProcess(): void {
     const startNewSession = (): void => {
       mainWindow?.webContents.send("menu-new-chat");
     };
+    const toggleVoice = (): void => {
+      mainWindow?.webContents.send("olympus:toggle-voice");
+    };
     createTray({
       getMainWindow: () => mainWindow,
       showMainWindow,
@@ -132,6 +135,7 @@ export function startMainProcess(): void {
       getMainWindow: () => mainWindow,
       showMainWindow,
       startNewSession,
+      toggleVoice,
     });
 
     app.on("activate", () => {

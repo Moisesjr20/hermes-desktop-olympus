@@ -3,6 +3,26 @@
 Mudanças notáveis desde o fork do upstream `fathah/hermes-desktop`.
 Formato segue [Keep a Changelog](https://keepachangelog.com/).
 
+## v0.7.9-olympus.1 (2026-11-02) — Onda 1a: voz hotkey
+
+### Added
+- **Push-to-talk global** `Cmd/Ctrl+Shift+V` — toggle do mic de qualquer app, mesmo com janela escondida (bring-to-front + ativa gravação).
+  - Preload: `window.hermesAPI.onToggleVoice(callback)` + canal IPC `olympus:toggle-voice`
+  - `ChatInput.tsx`: listener chama o mesmo `voice.toggle()` do botão mic
+- **Mensagem de erro clara em modo remoto** — antes aparecia "Transcription failed (404)". Agora: "Entrada por voz ainda não funciona neste modo remoto: o API server (:8642) não expõe /api/audio/transcribe. Use o modo Local, ou aguarde a Onda 1b."
+
+### Nota de arquitetura
+Infra de voz já existia parcialmente (SpeechButton, useVoiceInput, speech-playback,
+minimax-speech) mas acopla modo local. Para destravar voz em modo remoto é
+necessário:
+  - (1b.i) Fallback cliente-side via Web Speech API nativa
+  - (1b.ii) Settings pra Groq/OpenAI API key cloud (STT) + MiniMax key (TTS)
+  - (1b.iii) Auto-playback TTS no fim de resposta (toggle em settings)
+  - (1b.iv) Visual orb pulsando (thinking-orbs já instalado)
+  - (1b.v) Barge-in (interromper TTS enquanto fala)
+
+Essas 5 subondas ficam pra v0.7.10-olympus.0.
+
 ## v0.7.9-olympus.0 (2026-11-02) — Onda 0: presença ambiente
 
 ### Added
