@@ -14,6 +14,7 @@ export default {
     appearance: "المظهر",
     language: "اللغة",
     privacy: "الخصوصية",
+    voice: "Voice",
     connection: "الاتصال",
     network: "الشبكة",
     data: "البيانات",

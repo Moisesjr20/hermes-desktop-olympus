@@ -3,6 +3,30 @@
 Mudanças notáveis desde o fork do upstream `fathah/hermes-desktop`.
 Formato segue [Keep a Changelog](https://keepachangelog.com/).
 
+## v0.7.10-olympus.0 (2026-11-02) — Onda 1b: voz cloud (STT + TTS)
+
+Destrava voz em modo remoto (API server :8642 sem endpoints `/api/audio/*`).
+
+### Added
+- **STT via Groq Whisper** (cliente-side, modelo `whisper-large-v3-turbo`):
+  - `src/renderer/src/screens/Chat/cloudVoice.ts` — helpers `transcribeViaGroq` + `synthesizeViaOpenAi`
+  - `useVoiceInput.ts` tenta cloud primeiro se key configurada; fallback backend em caso de erro no final
+  - Custo: ~$0.03/hora de áudio, excelente PT-BR
+- **TTS via OpenAI** (10 vozes `alloy..shimmer`, modelo `gpt-4o-mini-tts`):
+  - `speech-playback.ts` branch cloud quando OpenAI key configurada (precede o backend MiniMax local-only)
+  - Custo: ~$0.015/1k caracteres
+- **Settings pane "Voz Cloud"** (`VoiceCloudPane.tsx`):
+  - Campos pra Groq key + OpenAI key (ambos ocultáveis, salvos em localStorage)
+  - Picker de voz OpenAI
+  - Toggle "auto-play respostas" (hook de disparo fica pra 1c)
+  - Links diretos pra consoles Groq / OpenAI pra pegar as keys
+
+### Changed
+- `speech-playback.ts`: mensagem de erro quando TTS tenta rodar em modo remoto sem cloud key agora é humana ("Configure OpenAI key em Settings → Voz Cloud").
+
+### Nota
+Auto-playback TTS (toggle do settings) ainda não dispara automaticamente ao fim de resposta — fica pra Onda 1c (precisa instrumentar `useDashboardChatTransport` no evento `stream-complete`). Botão 🔊 em cada bolha já funciona com cloud.
+
 ## v0.7.9-olympus.1 (2026-11-02) — Onda 1a: voz hotkey
 
 ### Added

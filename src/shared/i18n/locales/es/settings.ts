@@ -14,6 +14,7 @@ export default {
     appearance: "Apariencia",
     language: "Idioma",
     privacy: "Privacidad",
+    voice: "Voz",
     connection: "Conexión",
     network: "Red",
     data: "Datos",
