@@ -1175,6 +1175,7 @@ interface HermesAPI {
   // Menu events
   onMenuNewChat: (callback: () => void) => () => void;
   onMenuSearchSessions: (callback: () => void) => () => void;
+  onToggleVoice: (callback: () => void) => () => void;
 
   // Cron Jobs
   listCronJobs: (

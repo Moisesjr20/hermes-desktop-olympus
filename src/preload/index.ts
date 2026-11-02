@@ -1647,6 +1647,13 @@ const hermesAPI = {
     return () => ipcRenderer.removeListener("menu-search-sessions", handler);
   },
 
+  // Global shortcut Cmd/Ctrl+Shift+V → toggle do mic (Onda 1 — voz)
+  onToggleVoice: (callback: () => void): (() => void) => {
+    const handler = (): void => callback();
+    ipcRenderer.on("olympus:toggle-voice", handler);
+    return () => ipcRenderer.removeListener("olympus:toggle-voice", handler);
+  },
+
   // Cron Jobs
   listCronJobs: (
     includeDisabled?: boolean,

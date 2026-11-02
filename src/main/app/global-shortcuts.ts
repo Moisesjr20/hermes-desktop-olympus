@@ -4,6 +4,7 @@
  * - Cmd/Ctrl+Shift+O → toggle da janela OLYMPUS (abre se escondida, esconde se visível).
  *                      Escolhemos Shift+O pra não conflitar com Cmd/Ctrl+Space (Spotlight / IME).
  * - Cmd/Ctrl+Shift+N → mostra janela + envia IPC pra criar nova sessão.
+ * - Cmd/Ctrl+Shift+V → mostra janela + toggle do mic (push-to-talk, estilo toggle).
  *
  * Hotkeys são opcionais: se o registro falhar (outro app já reservou), apenas loga.
  */
@@ -13,6 +14,7 @@ interface ShortcutDeps {
   getMainWindow: () => BrowserWindow | null;
   showMainWindow: () => void;
   startNewSession: () => void;
+  toggleVoice: () => void;
 }
 
 const TOGGLE_WINDOW = process.platform === "darwin"
@@ -22,6 +24,10 @@ const TOGGLE_WINDOW = process.platform === "darwin"
 const NEW_SESSION = process.platform === "darwin"
   ? "Cmd+Shift+N"
   : "Ctrl+Shift+N";
+
+const TOGGLE_VOICE = process.platform === "darwin"
+  ? "Cmd+Shift+V"
+  : "Ctrl+Shift+V";
 
 export function registerGlobalShortcuts(deps: ShortcutDeps): void {
   const toggleOk = globalShortcut.register(TOGGLE_WINDOW, () => {
@@ -50,7 +56,17 @@ export function registerGlobalShortcuts(deps: ShortcutDeps): void {
     console.warn(`[SHORTCUT] Não registrou ${NEW_SESSION} (outro app reservou).`);
   }
 
+  const voiceOk = globalShortcut.register(TOGGLE_VOICE, () => {
+    deps.showMainWindow();
+    deps.toggleVoice();
+  });
+
+  if (!voiceOk) {
+    console.warn(`[SHORTCUT] Não registrou ${TOGGLE_VOICE} (outro app reservou).`);
+  }
+
   app.on("will-quit", () => {
     globalShortcut.unregisterAll();
   });
 }
+

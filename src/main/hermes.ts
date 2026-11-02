@@ -482,6 +482,13 @@ export async function transcribeAudio(
     if (!isRemoteMode() && res.status === 404) {
       return transcribeAudioViaLocalPython(audio, safeMimeType, resolved);
     }
+    if (isRemoteMode() && res.status === 404) {
+      throw new Error(
+        "Entrada por voz ainda não funciona neste modo remoto: o API server " +
+          "(:8642) não expõe /api/audio/transcribe. Use o modo Local, ou " +
+          "aguarde a Onda 1b (STT via Web Speech API / Groq cloud).",
+      );
+    }
     throw new Error(
       `Transcription failed (${res.status}). ${bodyText.slice(0, 200)}`.trim(),
     );
